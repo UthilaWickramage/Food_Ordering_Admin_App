@@ -2,8 +2,16 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.FoodOrderingAdminApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+<!--         <item name="colorPrimary">@color/purple</item>-->
     </style>
 
     <style name="Theme.FoodOrderingAdminApp" parent="Base.Theme.FoodOrderingAdminApp" />
+
+    <style name="Theme.FoodOrderingAdminApp.FullScreen" parent="Theme.FoodOrderingAdminApp">
+        <item name="backgroundColor">@color/black</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+    
+
 </resources>

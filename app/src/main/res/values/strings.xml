@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Food Ordering Admin App</string>
+    <string name="open_naigation_bar">Open Navigation Drawer</string>
+    <string name="close_navigation_bar">Closed Navigation Drawer</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="add_product">Add Product</string>
 </resources>
