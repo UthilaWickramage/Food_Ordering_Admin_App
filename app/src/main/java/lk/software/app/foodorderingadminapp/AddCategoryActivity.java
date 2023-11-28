@@ -117,6 +117,7 @@ public class AddCategoryActivity extends AppCompatActivity implements Navigation
                                         @Override
                                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                             progressDialog.dismiss();
+
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
@@ -157,8 +158,14 @@ public class AddCategoryActivity extends AppCompatActivity implements Navigation
             new ActivityResultCallback<ActivityResult>() {
                 @Override
                 public void onActivityResult(ActivityResult result) {
-                    imagePath = result.getData().getData();
-                    Picasso.get().load(imagePath).centerCrop().resize(200, 200).into(imageButton);
+                    if(result.getData()!=null){
+
+                        imagePath = result.getData().getData();
+                        Picasso.get().load(imagePath).centerCrop().resize(200, 200).into(imageButton);
+                    }else{
+                        Toast.makeText(AddCategoryActivity.this,"No Image Selected",Toast.LENGTH_LONG).show();
+                    }
+
                 }
             }
     );

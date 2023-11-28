@@ -7,30 +7,33 @@
     android:id="@+id/drawerLayout"
     tools:context=".AddProductActivity">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
+        android:layout_height="match_parent">
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:navigationIcon="@drawable/baseline_menu_24"
-            app:title="Add Product"
-            app:titleCentered="true"
-            >
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:navigationIcon="@drawable/baseline_menu_24"
+                app:title="Add Product"
+                app:titleCentered="true"
+                >
 
-            <ImageView
-                android:id="@+id/imageView4"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:layout_marginEnd="16dp"
-                android:layout_gravity="end"
-                app:layout_constraintBottom_toBottomOf="@+id/textView2"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/textView2"
-                app:srcCompat="@drawable/baseline_account_circle_24" />
-        </com.google.android.material.appbar.MaterialToolbar>
+                <ImageView
+                    android:id="@+id/imageView4"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_gravity="end"
+                    app:layout_constraintBottom_toBottomOf="@+id/textView2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/textView2"
+                    app:srcCompat="@drawable/baseline_account_circle_24" />
+            </com.google.android.material.appbar.MaterialToolbar>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -58,7 +61,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/imageButton" />
 
                 <EditText
-                    android:id="@+id/editTextText4"
+                    android:id="@+id/product_price_input"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
 
@@ -79,7 +82,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/categoryName" />
 
                 <EditText
-                    android:id="@+id/editTextText5"
+                    android:id="@+id/prepare_time_input"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
 
@@ -90,7 +93,7 @@
                     android:background="@drawable/text_field"
                     android:ems="10"
                     android:hint="Prepare time"
-                    android:inputType="text"
+                    android:inputType="number"
                     android:paddingStart="20dp"
                     android:paddingTop="15dp"
                     android:paddingEnd="20dp"
@@ -98,8 +101,31 @@
                     android:textColor="#1B1B1B"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/editTextText4" />
+                    app:layout_constraintTop_toBottomOf="@+id/product_price_input" />
 
+
+                <EditText
+                    android:id="@+id/person_per_serve_input"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:height="100dp"
+                    android:background="@drawable/text_field"
+                    android:ems="10"
+                    android:hint="Person per serve"
+                    android:inputType="number"
+                    android:paddingStart="20dp"
+                    android:paddingTop="15dp"
+                    android:paddingEnd="20dp"
+                    android:paddingBottom="15dp"
+                    android:textColor="#1B1B1B"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/prepare_time_input" />
 
                 <ImageButton
                     android:id="@+id/imageButton"
@@ -114,7 +140,7 @@
                     app:srcCompat="@android:drawable/ic_menu_add" />
 
                 <EditText
-                    android:id="@+id/editTextTextMultiLine"
+                    android:id="@+id/product_desc_input"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -131,8 +157,9 @@
                     android:paddingEnd="20dp"
                     android:paddingRight="15dp"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/editTextText5" />
+                    app:layout_constraintTop_toBottomOf="@+id/categorySpinner" />
 
                 <Button
                     android:id="@+id/addCategoryBtn"
@@ -143,14 +170,33 @@
                     android:backgroundTint="#673AB7"
                     android:text="Add product"
                     android:textSize="18sp"
-                    app:layout_constraintEnd_toEndOf="@+id/editTextTextMultiLine"
-                    app:layout_constraintStart_toStartOf="@+id/editTextTextMultiLine"
-                    app:layout_constraintTop_toBottomOf="@+id/editTextTextMultiLine" />
+                    app:layout_constraintEnd_toEndOf="@+id/product_desc_input"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toStartOf="@+id/product_desc_input"
+                    app:layout_constraintTop_toBottomOf="@+id/product_desc_input" />
+
+                <Spinner
+                    android:id="@+id/categorySpinner"
+                    android:layout_width="0dp"
+
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:autofillHints="Pick Category"
+                    android:background="@drawable/text_field"
+                    android:paddingStart="20dp"
+                    android:paddingTop="15dp"
+                    android:paddingEnd="20dp"
+                    android:paddingBottom="15dp"
+                    app:layout_constraintEnd_toEndOf="@+id/prepare_time_input"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="@+id/prepare_time_input"
+                    app:layout_constraintTop_toBottomOf="@+id/person_per_serve_input" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </LinearLayout>
+        </LinearLayout>
 
+    </ScrollView>
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
         android:layout_width="match_parent"

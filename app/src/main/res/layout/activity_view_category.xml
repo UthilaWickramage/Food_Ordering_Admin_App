@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:navigationIcon="@drawable/baseline_menu_24"
-            app:title="Add Category"
+            app:title="All Categories"
             app:titleCentered="true"
             >
 

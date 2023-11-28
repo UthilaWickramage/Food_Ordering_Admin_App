@@ -1,6 +1,7 @@
 package lk.software.app.foodorderingadminapp;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -18,13 +19,27 @@ import android.widget.TextView;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import lk.software.app.foodorderingadminapp.adapters.ProductAdapter;
 import lk.software.app.foodorderingadminapp.model.Product;
 
 public class ViewProductActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NavigationBarView.OnItemSelectedListener {
+
+    private FirebaseStorage firebaseStorage;
+    private FirebaseFirestore firebaseFirestore;
+    private ProductAdapter productAdapter;
+    private ArrayList<Product> products;
     private DrawerLayout drawerLayout;
+
     private NavigationView navigationView;
     private MaterialToolbar materialToolbar;
     @Override
@@ -35,6 +50,9 @@ public class ViewProductActivity extends AppCompatActivity implements Navigation
         drawerLayout = findViewById(R.id.drawerLayout);
         navigationView = findViewById(R.id.navigationView);
         materialToolbar = findViewById(R.id.toolbar);
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        firebaseStorage = FirebaseStorage.getInstance();
+        products = new ArrayList<>();
 
         setSupportActionBar(materialToolbar);
 
@@ -52,39 +70,12 @@ public class ViewProductActivity extends AppCompatActivity implements Navigation
 
         navigationView.setNavigationItemSelectedListener(this);
 
-        LayoutInflater layoutInflater = getLayoutInflater();
-        List<Product> newProducts = Product.getNewProducts();
 
-        RecyclerView.Adapter productAdapter = new RecyclerView.Adapter<ProductViewHolder>() {
-            @NonNull
-            @Override
-            public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = layoutInflater.inflate(R.layout.product_item, parent, false);
-                return new ProductViewHolder(view);
-            }
 
-            @Override
-            public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
-                holder.textView.setText(newProducts.get(position).getName());
-                holder.textView2.setText(String.valueOf(newProducts.get(position).getPrice()));
-                holder.imageView.setImageResource(newProducts.get(position).getImage());
-//                holder.imageView.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        Intent intent = new Intent(HomeActivity.this,ProductActivity.class);
-//                        startActivity(intent);
-//                    }
-//                });
-
-            }
-
-            @Override
-            public int getItemCount() {
-                return newProducts.size();
-            }
-        };
 
         RecyclerView recyclerView = findViewById(R.id.productRecyclerView);
+        loadProducts();
+        productAdapter = new ProductAdapter(firebaseStorage,ViewProductActivity.this,products);
         LinearLayoutManager layoutManager = new LinearLayoutManager(ViewProductActivity.this);
 
         recyclerView.setLayoutManager(layoutManager);
@@ -95,22 +86,23 @@ public class ViewProductActivity extends AppCompatActivity implements Navigation
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return false;
     }
-}
-
-class ProductViewHolder extends RecyclerView.ViewHolder {
-
-    ImageView imageView;
-    TextView textView;
-    TextView textView2;
 
 
-    public ProductViewHolder(@NonNull View v) {
-        super(v);
-        imageView = v.findViewById(R.id.category_item_image);
-        textView = v.findViewById(R.id.category_item_name);
-        textView = v.findViewById(R.id.textView);
-        textView2 = v.findViewById(R.id.textView19);
-
+    private void loadProducts(){
+        firebaseFirestore.collection("products")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                        products.clear();
+                        for(DocumentSnapshot snapshot:value.getDocuments()){
+                            Product product = snapshot.toObject(Product.class);
+                            products.add(product);
+                        }
+                        productAdapter.notifyDataSetChanged();
+                    }
+                });
     }
 }
+
+
 

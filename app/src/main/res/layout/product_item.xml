@@ -4,6 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:elevation="3dp"
+    android:layout_marginBottom="10dp"
     android:padding="10dp">
 
     <ImageView
@@ -37,7 +40,7 @@
             android:layout_height="5dp" />
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/product_category_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Pizza" />
@@ -48,19 +51,19 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/textView19"
+                android:id="@+id/product_price"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
                 android:layout_weight="1"
                 android:gravity="bottom"
                 android:text="$5.99"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <Button
                 android:id="@+id/button5"
-                android:layout_width="100dp"
+                android:layout_width="90dp"
                 android:layout_height="40dp"
                 android:layout_gravity="bottom"
                 android:backgroundTint="#E53935"

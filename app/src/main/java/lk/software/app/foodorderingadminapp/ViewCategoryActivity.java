@@ -38,6 +38,7 @@ public class ViewCategoryActivity extends AppCompatActivity implements Navigatio
     private FirebaseStorage firebaseStorage;
     private FirebaseFirestore firebaseFirestore;
 
+    private CategoryAdapter categoryAdapter;
     ArrayList<Category> categories;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
@@ -73,15 +74,23 @@ public class ViewCategoryActivity extends AppCompatActivity implements Navigatio
 
         navigationView.setNavigationItemSelectedListener(this);
 
-
-
-
         RecyclerView recyclerView = findViewById(R.id.categoryRecyclerView);
-        CategoryAdapter categoryAdapter = new CategoryAdapter(categories,firebaseStorage,ViewCategoryActivity.this);
+        loadCategories();
+        categoryAdapter = new CategoryAdapter(categories,firebaseStorage,ViewCategoryActivity.this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(ViewCategoryActivity.this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(categoryAdapter);
 
+
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        return false;
+    }
+
+
+    private void loadCategories(){
         firebaseFirestore.collection("categories")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
 
@@ -89,18 +98,16 @@ public class ViewCategoryActivity extends AppCompatActivity implements Navigatio
                     public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                         categories.clear();
                         for(DocumentSnapshot snapshot:value.getDocuments()) {
-                        Category category = snapshot.toObject(Category.class);
-                        categories.add(category);
+                            Category category = snapshot.toObject(Category.class);
+                            categories.add(category);
                         }
                         categoryAdapter.notifyDataSetChanged();
                     }
                 });
+
+
     }
 
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        return false;
-    }
 }
 
 
