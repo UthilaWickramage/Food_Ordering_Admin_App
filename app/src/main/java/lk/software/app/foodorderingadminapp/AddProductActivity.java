@@ -108,7 +108,7 @@ public class AddProductActivity extends AppCompatActivity implements NavigationV
                         0,
                         product_desc.getText().toString(),
                         "Pasta",
-                        4,
+                        Integer.parseInt(person_per_serve.getText().toString()),
                         imageId
                 );
 
