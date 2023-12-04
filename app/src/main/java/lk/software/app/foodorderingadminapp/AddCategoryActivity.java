@@ -36,11 +36,8 @@ import java.util.UUID;
 
 import lk.software.app.foodorderingadminapp.model.Category;
 
-public class AddCategoryActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NavigationBarView.OnItemSelectedListener {
+public class AddCategoryActivity extends AppCompatActivity {
 
-    private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
-    private MaterialToolbar materialToolbar;
 
     private FirebaseStorage firebaseStorage;
     private FirebaseFirestore firebaseFirestore;
@@ -55,27 +52,18 @@ public class AddCategoryActivity extends AppCompatActivity implements Navigation
 
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
-        drawerLayout = findViewById(R.id.drawerLayout);
-        navigationView = findViewById(R.id.navigationView);
-        materialToolbar = findViewById(R.id.toolbar);
 
-        setSupportActionBar(materialToolbar);
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open_naigation_bar, R.string.close_navigation_bar);
-        drawerLayout.addDrawerListener(toggle);
 
-        toggle.syncState();
-
-        materialToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.open();
-            }
-        });
-
-        navigationView.setNavigationItemSelectedListener(this);
 
         imageButton = findViewById(R.id.imageButton);
+
+        findViewById(R.id.imageView3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         //loading image to the image button
         imageButton.setOnClickListener(new View.OnClickListener() {
@@ -148,10 +136,7 @@ public class AddCategoryActivity extends AppCompatActivity implements Navigation
         });
     }
 
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        return false;
-    }
+
 
     ActivityResultLauncher activityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),

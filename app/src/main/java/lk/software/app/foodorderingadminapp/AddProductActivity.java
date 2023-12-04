@@ -5,6 +5,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -17,6 +18,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
@@ -24,7 +27,12 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -36,47 +44,51 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+import lk.software.app.foodorderingadminapp.model.Category;
 import lk.software.app.foodorderingadminapp.model.Product;
 
-public class AddProductActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NavigationBarView.OnItemSelectedListener {
+public class AddProductActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     public static final String TAG = AddProductActivity.class.getName();
-    private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
-    private MaterialToolbar materialToolbar;
     private FirebaseFirestore firebaseFirestore;
 
     private FirebaseStorage firebaseStorage;
     private ImageButton imageButton;
     private Uri imagePath;
 
+    ArrayList<String> categories;
+
+String category_name;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_product);
-        drawerLayout = findViewById(R.id.drawerLayout);
-        navigationView = findViewById(R.id.navigationView);
-        materialToolbar = findViewById(R.id.toolbar);
+
         firebaseStorage = FirebaseStorage.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
+        Spinner spinner = findViewById(R.id.categorySpinner);
+        spinner.setOnItemSelectedListener(this);
+        categories = new ArrayList<>();
+        categories.add("Select Category");
+        loadCategoryNames();
+        ArrayAdapter<String> stringArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
+// Specify the layout to use when the list of choices appears.
+        stringArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+// Apply the adapter to the spinner.
+        spinner.setAdapter(stringArrayAdapter);
 
-        setSupportActionBar(materialToolbar);
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open_naigation_bar, R.string.close_navigation_bar);
-        drawerLayout.addDrawerListener(toggle);
-
-        toggle.syncState();
-
-        materialToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.imageView3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawerLayout.open();
+                finish();
             }
         });
 
-        navigationView.setNavigationItemSelectedListener(this);
         imageButton = findViewById(R.id.imageButton);
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,7 +110,7 @@ public class AddProductActivity extends AppCompatActivity implements NavigationV
                 EditText product_price = findViewById(R.id.product_price_input);
                 EditText prepare_time = findViewById(R.id.prepare_time_input);
                 EditText person_per_serve = findViewById(R.id.person_per_serve_input);
-                Spinner categorySpinner = findViewById(R.id.categorySpinner);
+Log.d("category-name",category_name);
                 EditText product_desc = findViewById(R.id.product_desc_input);
                 String imageId = UUID.randomUUID().toString();
                 Product product = new Product(
@@ -107,7 +119,7 @@ public class AddProductActivity extends AppCompatActivity implements NavigationV
                         Integer.valueOf(prepare_time.getText().toString()),
                         0,
                         product_desc.getText().toString(),
-                        "Pasta",
+                        category_name,
                         Integer.parseInt(person_per_serve.getText().toString()),
                         imageId
                 );
@@ -121,7 +133,7 @@ public class AddProductActivity extends AppCompatActivity implements NavigationV
                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                             @Override
                             public void onSuccess(DocumentReference documentReference) {
-                                if(imagePath!=null){
+                                if (imagePath != null) {
                                     progressDialog.setMessage("Uploading the image");
                                     StorageReference storageReference = firebaseStorage.getReference("productImages")
                                             .child(imageId);
@@ -130,21 +142,21 @@ public class AddProductActivity extends AppCompatActivity implements NavigationV
                                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                             progressDialog.dismiss();
                                             product_name.clearComposingText();
-                                            Toast.makeText(AddProductActivity.this,"Product saved successfully",Toast.LENGTH_LONG).show();
+                                            Toast.makeText(AddProductActivity.this, "Product saved successfully", Toast.LENGTH_LONG).show();
 
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
                                             progressDialog.dismiss();
-                                            Toast.makeText(AddProductActivity.this,"Oops! Something went wrong",Toast.LENGTH_LONG).show();
+                                            Toast.makeText(AddProductActivity.this, "Oops! Something went wrong", Toast.LENGTH_LONG).show();
 
                                         }
                                     }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                                         @Override
                                         public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
-                                            double progress = (100.0*snapshot.getBytesTransferred())/snapshot.getTotalByteCount();
-                                        progressDialog.setMessage("Uploading image... "+(int) progress+"% done");
+                                            double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
+                                            progressDialog.setMessage("Uploading image... " + (int) progress + "% done");
                                         }
                                     });
                                 }
@@ -153,12 +165,26 @@ public class AddProductActivity extends AppCompatActivity implements NavigationV
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 progressDialog.dismiss();
-                                Toast.makeText(AddProductActivity.this,"Couldn't save the product",Toast.LENGTH_LONG).show();
+                                Toast.makeText(AddProductActivity.this, "Couldn't save the product", Toast.LENGTH_LONG).show();
                             }
                         });
             }
         });
 
+    }
+
+    private void loadCategoryNames() {
+        firebaseFirestore.collection("categories")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                        for(DocumentSnapshot snapshot :value.getDocuments()) {
+Category category = snapshot.toObject(Category.class);
+                            categories.add(category.getName());
+                        }
+
+                    }
+                });
     }
 
     ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
@@ -167,15 +193,15 @@ public class AddProductActivity extends AppCompatActivity implements NavigationV
                 @Override
                 public void onActivityResult(ActivityResult result) {
                     if (result.getResultCode() == Activity.RESULT_OK) {
-                       if(result.getData()!=null){
-                           imagePath = result.getData().getData();
-                           Log.d(TAG, imagePath.getPath());
-                           Picasso.get().load(imagePath).centerCrop().resize(200, 200).into(imageButton);
+                        if (result.getData() != null) {
+                            imagePath = result.getData().getData();
+                            Log.d(TAG, imagePath.getPath());
+                            Picasso.get().load(imagePath).centerCrop().resize(200, 200).into(imageButton);
 
-                       }else{
-                           Toast.makeText(AddProductActivity.this,"No image selected",Toast.LENGTH_LONG).show();
-                       }
-                    }else{
+                        } else {
+                            Toast.makeText(AddProductActivity.this, "No image selected", Toast.LENGTH_LONG).show();
+                        }
+                    } else {
 
                     }
                 }
@@ -183,7 +209,15 @@ public class AddProductActivity extends AppCompatActivity implements NavigationV
     );
 
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        return false;
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        category_name = parent.getItemAtPosition(position).toString();
+        Toast.makeText(AddProductActivity.this, category_name, Toast.LENGTH_LONG).show();
+Log.d("onItemSelected",category_name);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        Toast.makeText(AddProductActivity.this, "nothing selected", Toast.LENGTH_LONG).show();
+
     }
 }

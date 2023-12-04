@@ -8,6 +8,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -32,43 +33,24 @@ import java.util.List;
 import lk.software.app.foodorderingadminapp.adapters.ProductAdapter;
 import lk.software.app.foodorderingadminapp.model.Product;
 
-public class ViewProductActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NavigationBarView.OnItemSelectedListener {
+public class ViewProductActivity extends AppCompatActivity  {
 
     private FirebaseStorage firebaseStorage;
     private FirebaseFirestore firebaseFirestore;
     private ProductAdapter productAdapter;
     private ArrayList<Product> products;
-    private DrawerLayout drawerLayout;
 
-    private NavigationView navigationView;
-    private MaterialToolbar materialToolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_product);
 
-        drawerLayout = findViewById(R.id.drawerLayout);
-        navigationView = findViewById(R.id.navigationView);
-        materialToolbar = findViewById(R.id.toolbar);
+
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
         products = new ArrayList<>();
 
-        setSupportActionBar(materialToolbar);
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open_naigation_bar, R.string.close_navigation_bar);
-        drawerLayout.addDrawerListener(toggle);
-
-        toggle.syncState();
-
-        materialToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.open();
-            }
-        });
-
-        navigationView.setNavigationItemSelectedListener(this);
 
 
 
@@ -80,12 +62,22 @@ public class ViewProductActivity extends AppCompatActivity implements Navigation
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(productAdapter);
+
+        findViewById(R.id.imageView3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        findViewById(R.id.button3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ViewProductActivity.this,AddProductActivity.class));
+            }
+        });
     }
 
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        return false;
-    }
+
 
 
     private void loadProducts(){
@@ -96,6 +88,7 @@ public class ViewProductActivity extends AppCompatActivity implements Navigation
                         products.clear();
                         for(DocumentSnapshot snapshot:value.getDocuments()){
                             Product product = snapshot.toObject(Product.class);
+                            product.setDocumentId(snapshot.getId());
                             products.add(product);
                         }
                         productAdapter.notifyDataSetChanged();

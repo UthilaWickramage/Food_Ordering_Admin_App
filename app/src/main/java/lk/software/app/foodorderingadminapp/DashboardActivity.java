@@ -22,35 +22,20 @@ import com.google.android.material.navigation.NavigationView;
 
 
 
-public class DashboardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NavigationBarView.OnItemSelectedListener {
+public class DashboardActivity extends AppCompatActivity {
 
-    private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
-    private MaterialToolbar materialToolbar;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
-        drawerLayout = findViewById(R.id.drawerLayout);
-        navigationView = findViewById(R.id.navigationView);
-        materialToolbar = findViewById(R.id.toolbar);
 
-        setSupportActionBar(materialToolbar);
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open_naigation_bar, R.string.close_navigation_bar);
-        drawerLayout.addDrawerListener(toggle);
 
-        toggle.syncState();
 
-        materialToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.open();
-            }
-        });
-        navigationView.setNavigationItemSelectedListener(this);
+
         CardView addProductCard = findViewById(R.id.addProductCard);
         CardView viewUsersCard = findViewById(R.id.viewUsersCard);
         CardView addCategoryCard = findViewById(R.id.addCategoryCard);
@@ -68,7 +53,7 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         viewUsersCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent1 = new Intent(DashboardActivity.this, AddProductActivity.class);
+                Intent intent1 = new Intent(DashboardActivity.this, ViewUserActivity.class);
                 startActivity(intent1);
             }
         });
@@ -114,11 +99,7 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
     }
 
 
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-        return false;
-    }
 
 
 }

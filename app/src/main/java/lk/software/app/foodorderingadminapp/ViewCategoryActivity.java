@@ -8,6 +8,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -33,16 +34,14 @@ import lk.software.app.foodorderingadminapp.adapters.CategoryAdapter;
 import lk.software.app.foodorderingadminapp.model.Category;
 import lk.software.app.foodorderingadminapp.model.Product;
 
-public class ViewCategoryActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NavigationBarView.OnItemSelectedListener {
+public class ViewCategoryActivity extends AppCompatActivity{
 
     private FirebaseStorage firebaseStorage;
     private FirebaseFirestore firebaseFirestore;
 
     private CategoryAdapter categoryAdapter;
     ArrayList<Category> categories;
-    private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
-    private MaterialToolbar materialToolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,26 +52,7 @@ public class ViewCategoryActivity extends AppCompatActivity implements Navigatio
         firebaseStorage = FirebaseStorage.getInstance();
         categories = new ArrayList<>();
 
-        //navigation variables
-        drawerLayout = findViewById(R.id.drawerLayout);
-        navigationView = findViewById(R.id.navigationView);
-        materialToolbar = findViewById(R.id.toolbar);
 
-        setSupportActionBar(materialToolbar);
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open_naigation_bar, R.string.close_navigation_bar);
-        drawerLayout.addDrawerListener(toggle);
-
-        toggle.syncState();
-
-        materialToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.open();
-            }
-        });
-
-        navigationView.setNavigationItemSelectedListener(this);
 
         RecyclerView recyclerView = findViewById(R.id.categoryRecyclerView);
         loadCategories();
@@ -81,13 +61,20 @@ public class ViewCategoryActivity extends AppCompatActivity implements Navigatio
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(categoryAdapter);
 
-
-    }
-
+findViewById(R.id.imageView3).setOnClickListener(new View.OnClickListener() {
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        return false;
+    public void onClick(View v) {
+        finish();
     }
+});
+        findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ViewCategoryActivity.this, AddCategoryActivity.class));
+            }
+        });
+    }
+
 
 
     private void loadCategories(){

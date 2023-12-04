@@ -15,8 +15,17 @@ public class Product {
     public String description;
     private int person_per_serve;
     public String image;
+private  String documentId;
 
-    public Product(String name, double price, int prepare_time, int rating, String description,String category_name,int person_per_serve, String image) {
+    public String getDocumentId() {
+        return documentId;
+    }
+
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
+    }
+
+    public Product(String name, double price, int prepare_time, int rating, String description, String category_name, int person_per_serve, String image) {
         this.name = name;
         this.price = price;
         this.prepare_time = prepare_time;
