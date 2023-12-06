@@ -15,19 +15,28 @@ import androidx.fragment.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.AggregateQuery;
+import com.google.firebase.firestore.AggregateQuerySnapshot;
+import com.google.firebase.firestore.AggregateSource;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 
 public class DashboardActivity extends AppCompatActivity {
-
-
+TextView customerCount,categoryCount,productCount;
+FirebaseFirestore firebaseFirestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +44,11 @@ public class DashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dashboard);
 
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        customerCount = findViewById(R.id.customerCount);
+        categoryCount = findViewById(R.id.categoryCount);
+        productCount = findViewById(R.id.productCount);
+        loadCountsDashBoard();
 
         CardView addProductCard = findViewById(R.id.addProductCard);
         CardView viewUsersCard = findViewById(R.id.viewUsersCard);
@@ -115,8 +129,51 @@ public class DashboardActivity extends AppCompatActivity {
 
     }
 
+    private void loadCountsDashBoard() {
+        AggregateQuery customerCountQuery = firebaseFirestore.collection("customers").count();
+        AggregateQuery categoryCountQuery = firebaseFirestore.collection("categories").count();
+        AggregateQuery productCountQuery = firebaseFirestore.collection("products").count();
 
-
+        customerCountQuery.get(AggregateSource.SERVER).addOnCompleteListener(new OnCompleteListener<AggregateQuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<AggregateQuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    // Count fetched successfully
+                    AggregateQuerySnapshot snapshot = task.getResult();
+                    customerCount.setText(String.valueOf(snapshot.getCount()));
+                    Log.d("count", "Count: " + snapshot.getCount());
+                } else {
+                    Log.d("count", "Count failed: ", task.getException());
+                }
+            }
+        });
+        categoryCountQuery.get(AggregateSource.SERVER).addOnCompleteListener(new OnCompleteListener<AggregateQuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<AggregateQuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    // Count fetched successfully
+                    AggregateQuerySnapshot snapshot = task.getResult();
+                    categoryCount.setText(String.valueOf(snapshot.getCount()));
+                    Log.d("count", "Count: " + snapshot.getCount());
+                } else {
+                    Log.d("count", "Count failed: ", task.getException());
+                }
+            }
+        });
+        productCountQuery.get(AggregateSource.SERVER).addOnCompleteListener(new OnCompleteListener<AggregateQuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<AggregateQuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    // Count fetched successfully
+                    AggregateQuerySnapshot snapshot = task.getResult();
+                    productCount.setText(String.valueOf(snapshot.getCount()));
+                    Log.d("count", "Count: " + snapshot.getCount());
+                } else {
+                    Log.d("count", "Count failed: ", task.getException());
+                }
+            }
+        });
+    }
 
 
 }
