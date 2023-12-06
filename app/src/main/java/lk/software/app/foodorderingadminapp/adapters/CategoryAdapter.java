@@ -45,12 +45,17 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         Category category = categories.get(position);
 
         holder.textView.setText(category.getName());
-        firebaseStorage.getReference("categoryImages/" + category.getImage()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        new Thread(new Runnable() {
             @Override
-            public void onSuccess(Uri uri) {
-                Picasso.get().load(uri).centerCrop().resize(100, 100).into(holder.imageView);
+            public void run() {
+                firebaseStorage.getReference("categoryImages/" + category.getImage()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        holder.imageView.post(() -> Picasso.get().load(uri).centerCrop().resize(100, 100).into(holder.imageView));
+                    }
+                });
             }
-        });
+        }).start();
     }
 
     @Override

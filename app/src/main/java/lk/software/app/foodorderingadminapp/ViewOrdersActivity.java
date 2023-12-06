@@ -49,22 +49,24 @@ private Order order;
     }
 
     private void loadOrders() {
-        firebaseFirestore.collection("orders").document(documentId).collection("order_list")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        orders.clear();
-                        for (DocumentSnapshot snapshot : value.getDocuments()) {
-                            order = snapshot.toObject(Order.class);
-                            order.setDocumentId(snapshot.getId());
-order.setCustomer_id(documentId);
-order.setCustomer_name(customer_name);
-                            orders.add(order);
+        new Thread(()->{
+            firebaseFirestore.collection("orders").document(documentId).collection("order_list")
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                            orders.clear();
+                            for (DocumentSnapshot snapshot : value.getDocuments()) {
+                                order = snapshot.toObject(Order.class);
+                                order.setDocumentId(snapshot.getId());
+                                order.setCustomer_id(documentId);
+                                order.setCustomer_name(customer_name);
+                                orders.add(order);
+                            }
+                            orderAdapter.notifyDataSetChanged();
                         }
-                        orderAdapter.notifyDataSetChanged();
-                    }
 
-                });
+                    });
+        }).start();
     }
 
 

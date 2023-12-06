@@ -53,9 +53,6 @@ public class AddCategoryActivity extends AppCompatActivity {
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
 
-
-
-
         imageButton = findViewById(R.id.imageButton);
 
         findViewById(R.id.imageView3).setOnClickListener(new View.OnClickListener() {
@@ -81,9 +78,21 @@ public class AddCategoryActivity extends AppCompatActivity {
         findViewById(R.id.addCategoryBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 EditText editText = findViewById(R.id.categoryName);
 
+
                 String title = editText.getText().toString();
+                if(title.isEmpty()){
+                    editText.setError("Category name can't be empty");
+                    return;
+                }
+
+                if(imagePath==null){
+                    Toast.makeText(AddCategoryActivity.this,"Please select an image",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 String imageId = UUID.randomUUID().toString();
 
                 Category category = new Category(title, imageId);
@@ -93,44 +102,50 @@ public class AddCategoryActivity extends AppCompatActivity {
                 progressDialog.setMessage("Saving the new category");
                 progressDialog.show();
 
-                firebaseFirestore.collection("categories").add(category)
-                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                            @Override
-                            public void onSuccess(DocumentReference documentReference) {
-                                if (imagePath != null) {
-                                    progressDialog.setMessage("Uploading the category image");
-                                    StorageReference reference = firebaseStorage.getReference("categoryImages")
-                                            .child(imageId);
-                                    reference.putFile(imagePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                        @Override
-                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                            progressDialog.dismiss();
+                new Thread(()->{
+                    firebaseFirestore.collection("categories").add(category)
+                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    if (imagePath != null) {
+                                        AddCategoryActivity.this.runOnUiThread(()->{
+                                            progressDialog.setMessage("Uploading the category image");
+                                        });
+                                        StorageReference reference = firebaseStorage.getReference("categoryImages")
+                                                .child(imageId);
+                                        reference.putFile(imagePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                            @Override
+                                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                AddCategoryActivity.this.runOnUiThread(progressDialog::dismiss);
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                AddCategoryActivity.this.runOnUiThread(progressDialog::dismiss);
+                                                Toast.makeText(AddCategoryActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                            }
+                                        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                                            @Override
+                                            public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
+                                                double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
+                                                AddCategoryActivity.this.runOnUiThread(()->{
+                                                    progressDialog.setMessage("Uploading image... " + (int) progress + "% done");
 
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            progressDialog.dismiss();
-                                            Toast.makeText(AddCategoryActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                                        }
-                                    }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                                        @Override
-                                        public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
-                                            double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
-                                            progressDialog.setMessage("Uploading image... " + (int) progress + "% done");
-                                        }
-                                    });
+                                                });
+                                            }
+                                        });
+                                    }
+
                                 }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    AddCategoryActivity.this.runOnUiThread(progressDialog::dismiss);
+                                    Toast.makeText(AddCategoryActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
 
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                progressDialog.dismiss();
-                                Toast.makeText(AddCategoryActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-
-                            }
-                        });
+                                }
+                            });
+                }).start();
 
             }
         });

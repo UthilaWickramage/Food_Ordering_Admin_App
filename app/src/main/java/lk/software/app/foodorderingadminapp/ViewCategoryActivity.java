@@ -78,19 +78,21 @@ findViewById(R.id.imageView3).setOnClickListener(new View.OnClickListener() {
 
 
     private void loadCategories(){
-        firebaseFirestore.collection("categories")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+        new Thread(()->{
+            firebaseFirestore.collection("categories")
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
 
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        categories.clear();
-                        for(DocumentSnapshot snapshot:value.getDocuments()) {
-                            Category category = snapshot.toObject(Category.class);
-                            categories.add(category);
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                            categories.clear();
+                            for(DocumentSnapshot snapshot:value.getDocuments()) {
+                                Category category = snapshot.toObject(Category.class);
+                                categories.add(category);
+                            }
+                            categoryAdapter.notifyDataSetChanged();
                         }
-                        categoryAdapter.notifyDataSetChanged();
-                    }
-                });
+                    });
+        }).start();
 
 
     }

@@ -64,20 +64,24 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         holder.category_name.setText(products.get(position).getCategory_name());
         String string_price = new DecimalFormat("0.00").format(products.get(position).getPrice());
         holder.price.setText(string_price);
-
-        firebaseStorage.getReference("productImages/"+products.get(position).getImage()).getDownloadUrl()
-                        .addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
+        new Thread(() -> {
+            firebaseStorage.getReference("productImages/" + products.get(position).getImage()).getDownloadUrl()
+                    .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            holder.product_image.post(() -> {
                                 Picasso.get().load(uri).centerCrop().resize(100, 100).into(holder.product_image);
 
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
-                    }
-                });
+                            });
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+        }).start();
+
 
         holder.button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,38 +93,40 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                                        StorageReference storageReference = firebaseStorage.getReference();
-                                        StorageReference childReference = storageReference.child("productImages/"+products.get(position).getImage());
-                                        childReference.delete()
-                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                            @Override
-                                                            public void onSuccess(Void unused) {
-                                                                firebaseFirestore.collection("products").document(products.get(position).getDocumentId())
-                                                                        .delete()
-                                                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                                    @Override
-                                                                                    public void onSuccess(Void unused) {
+                        new Thread(() -> {
+                            StorageReference storageReference = firebaseStorage.getReference();
+                            StorageReference childReference = storageReference.child("productImages/" + products.get(position).getImage());
+                            childReference.delete()
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            firebaseFirestore.collection("products").document(products.get(position).getDocumentId())
+                                                    .delete()
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void unused) {
 
-                                                                                    }
-                                                                                }).addOnFailureListener(new OnFailureListener() {
-                                                                            @Override
-                                                                            public void onFailure(@NonNull Exception e) {
+                                                        }
+                                                    }).addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
 
-                                                                            }
-                                                                        });
-                                                                Log.d(MainActivity.TAG, "image deleted!");
-                                                            }
-                                                        }).addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        Log.e(MainActivity.TAG, "image deletion failed!");
+                                                        }
+                                                    });
+                                            Log.d(MainActivity.TAG, "image deleted!");
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.e(MainActivity.TAG, "image deletion failed!");
 
-                                                    }
-                                                });
-                                        Log.d(MainActivity.TAG, "DocumentSnapshot successfully deleted!");
-                                    }
+                                        }
+                                    });
+                            Log.d(MainActivity.TAG, "DocumentSnapshot successfully deleted!");
+                        }).start();
+                    }
 
-                    });
+                });
 
                 alertDialog.show();
 

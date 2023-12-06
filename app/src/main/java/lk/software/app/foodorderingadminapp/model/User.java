@@ -13,6 +13,8 @@ public class User {
 
     private String address;
 
+    private String status;
+
     private String city;
 
     private String postal_code;
@@ -127,5 +129,13 @@ public class User {
 
     public void setProfile_img(String profile_img) {
         this.profile_img = profile_img;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

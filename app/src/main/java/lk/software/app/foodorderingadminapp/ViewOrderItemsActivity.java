@@ -100,20 +100,22 @@ public class ViewOrderItemsActivity extends AppCompatActivity implements Adapter
     }
 
     private void loadOrderItems() {
-        firebaseFirestore.collection("orders").document(customerId).collection("order_list").document(documentId).collection("order_items")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        orderItems.clear();
-                        for (DocumentSnapshot snapshot : value.getDocuments()) {
-                            orderItem = snapshot.toObject(OrderItem.class);
+        new Thread(()->{
+            firebaseFirestore.collection("orders").document(customerId).collection("order_list").document(documentId).collection("order_items")
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                            orderItems.clear();
+                            for (DocumentSnapshot snapshot : value.getDocuments()) {
+                                orderItem = snapshot.toObject(OrderItem.class);
 
-                            orderItems.add(orderItem);
+                                orderItems.add(orderItem);
+                            }
+                            orderItemAdapter.notifyDataSetChanged();
                         }
-                        orderItemAdapter.notifyDataSetChanged();
-                    }
 
-                });
+                    });
+        }).start();
     }
 
     @Override

@@ -24,18 +24,19 @@ import lk.software.app.foodorderingadminapp.R;
 import lk.software.app.foodorderingadminapp.model.Order;
 import lk.software.app.foodorderingadminapp.model.OrderItem;
 
-public class OrderItemAdapter extends RecyclerView.Adapter<OrderItemAdapter.ViewHolder>{
+public class OrderItemAdapter extends RecyclerView.Adapter<OrderItemAdapter.ViewHolder> {
     private Context context;
     private ArrayList<OrderItem> orderItems;
 
     private FirebaseStorage firebaseStorage;
 
 
-    public OrderItemAdapter(Context context,FirebaseStorage firebaseStorage, ArrayList<OrderItem> orderItems) {
-this.firebaseStorage = firebaseStorage;
+    public OrderItemAdapter(Context context, FirebaseStorage firebaseStorage, ArrayList<OrderItem> orderItems) {
+        this.firebaseStorage = firebaseStorage;
         this.context = context;
         this.orderItems = orderItems;
     }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -49,14 +50,19 @@ this.firebaseStorage = firebaseStorage;
         holder.titleText.setText(orderItem.getProduct_name());
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
         holder.order_item_price.setText(decimalFormat.format(orderItem.getPrice()));
-        holder.order_qty.setText("x"+String.valueOf(orderItem.getQuantity()));
-        firebaseStorage.getReference("productImages/"+orderItem.getImage()).getDownloadUrl()
-                .addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        Picasso.get().load(uri).centerCrop().resize(75,75).into(holder.imageView);
-                    }
-                });
+        holder.order_qty.setText("x" + String.valueOf(orderItem.getQuantity()));
+        new Thread(() -> {
+            firebaseStorage.getReference("productImages/" + orderItem.getImage()).getDownloadUrl()
+                    .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            holder.imageView.post(() -> {
+                                Picasso.get().load(uri).centerCrop().resize(75, 75).into(holder.imageView);
+
+                            });
+                        }
+                    });
+        }).start();
     }
 
     @Override

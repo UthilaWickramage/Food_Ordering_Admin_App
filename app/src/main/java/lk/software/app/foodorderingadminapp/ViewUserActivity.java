@@ -36,6 +36,7 @@ public class ViewUserActivity extends AppCompatActivity {
         firebaseStorage = FirebaseStorage.getInstance();
         users = new ArrayList<>();
 
+
         findViewById(R.id.imageView3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -45,7 +46,7 @@ public class ViewUserActivity extends AppCompatActivity {
 
         RecyclerView recyclerView = findViewById(R.id.userRecycler);
         loadUsers();
-        userAdapter = new UserAdapter(firebaseStorage,ViewUserActivity.this,users);
+        userAdapter = new UserAdapter(firebaseStorage,firebaseFirestore,ViewUserActivity.this,users);
         LinearLayoutManager layoutManager = new LinearLayoutManager(ViewUserActivity.this);
 
         recyclerView.setLayoutManager(layoutManager);
@@ -53,19 +54,21 @@ public class ViewUserActivity extends AppCompatActivity {
     }
 
     private void loadUsers() {
-        firebaseFirestore.collection("customers")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        users.clear();
-                        for(DocumentSnapshot snapshot:value.getDocuments()){
-                            User user = snapshot.toObject(User.class);
-                            user.setDocumentId(snapshot.getId());
-                            users.add(user);
+        new Thread(()->{
+            firebaseFirestore.collection("customers")
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                            users.clear();
+                            for(DocumentSnapshot snapshot:value.getDocuments()){
+                                User user = snapshot.toObject(User.class);
+                                user.setDocumentId(snapshot.getId());
+                                users.add(user);
 
+                            }
+                            userAdapter.notifyDataSetChanged();
                         }
-                        userAdapter.notifyDataSetChanged();
-                    }
-                });
+                    });
+        }).start();
     }
 }

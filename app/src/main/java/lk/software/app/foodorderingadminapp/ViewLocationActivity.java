@@ -56,12 +56,14 @@ public class ViewLocationActivity extends AppCompatActivity implements OnMapRead
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_location);
         firebaseFirestore = FirebaseFirestore.getInstance();
-        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+
         customerId = getIntent().getExtras().getString("customerId");
+        Log.d("customer_id",customerId);
         address = findViewById(R.id.textView25);
         area = findViewById(R.id.textView37);
         city = findViewById(R.id.textView38);
         postalCode = findViewById(R.id.textView23);
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
@@ -79,49 +81,42 @@ public class ViewLocationActivity extends AppCompatActivity implements OnMapRead
         this.googleMap = map;
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         googleMap.getUiSettings().setZoomControlsEnabled(true);
-        firebaseFirestore.collection("customers").document(customerId).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            User user = task.getResult().toObject(User.class);
-                            if (user != null) {
-                                String latitude = user.getLatitude();
-                                String longitude = user.getLongitude();
-                                LatLng latLng = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
-                                googleMap.addMarker(new MarkerOptions().position(latLng).title("Delivery Location"));
-                                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,50));                           if (user.getAddress() != null) {
-                                    address.setText(user.getAddress());
-                                }
-                                if (user.getCity() != null) {
-                                    city.setText(user.getCity());
-                                }
-                                if (user.getArea() != null) {
-                                    area.setText(user.getArea());
+        new Thread(()->{
+            firebaseFirestore.collection("customers").document(customerId).get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                User user = task.getResult().toObject(User.class);
+                                if (user != null) {
+                                    String latitude = user.getLatitude();
+                                    String longitude = user.getLongitude();
+                                    LatLng latLng = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
+                                    googleMap.addMarker(new MarkerOptions().position(latLng).title("Delivery Location"));
+                                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 50));
+                                    if (user.getAddress() != null) {
+                                        address.setText(user.getAddress());
+                                    }
+                                    if (user.getCity() != null) {
+                                        city.setText(user.getCity());
+                                    }
+                                    if (user.getArea() != null) {
+                                        area.setText(user.getArea());
+                                    }
+
+                                    if (user.getPostal_code() != null) {
+                                        postalCode.setText(user.getPostal_code());
+                                    }
+
                                 }
 
-                                if (user.getPostal_code() != null) {
-                                    postalCode.setText(user.getPostal_code());
-                                }
 
                             }
 
 
                         }
-
-
-                    }
-                });
-    }
-
-    private void moveCamera(LatLng latLng){
-        CameraPosition cameraPosition = CameraPosition.builder()
-                .target(latLng)
-                .zoom(60f)
-                .build();
-
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
-        googleMap.animateCamera(cameraUpdate);
+                    });
+        }).start();
 
     }
 

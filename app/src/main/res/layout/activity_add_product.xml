@@ -88,7 +88,7 @@
                     android:background="@drawable/text_field"
                     android:ems="10"
                     android:hint="Product price"
-                    android:inputType="text"
+                    android:inputType="number"
                     android:paddingStart="20dp"
                     android:paddingTop="15dp"
                     android:paddingEnd="20dp"

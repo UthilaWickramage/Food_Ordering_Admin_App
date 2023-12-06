@@ -43,12 +43,12 @@ android:id="@+id/drawerLayout"
 
                <ImageView
                    android:id="@+id/imageView5"
-                   android:layout_width="40dp"
-                   android:layout_height="40dp"
+                   android:layout_width="35dp"
+                   android:layout_height="35dp"
                    app:layout_constraintBottom_toBottomOf="@+id/textView"
                    app:layout_constraintEnd_toEndOf="parent"
                    app:layout_constraintTop_toTopOf="@+id/textView"
-                   app:srcCompat="@drawable/baseline_admin_panel_settings_24" />
+                   app:srcCompat="@drawable/baseline_logout_24" />
            </androidx.constraintlayout.widget.ConstraintLayout>
 
            <FrameLayout

@@ -81,19 +81,21 @@ public class ViewProductActivity extends AppCompatActivity  {
 
 
     private void loadProducts(){
-        firebaseFirestore.collection("products")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        products.clear();
-                        for(DocumentSnapshot snapshot:value.getDocuments()){
-                            Product product = snapshot.toObject(Product.class);
-                            product.setDocumentId(snapshot.getId());
-                            products.add(product);
+        new Thread(()->{
+            firebaseFirestore.collection("products")
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                            products.clear();
+                            for(DocumentSnapshot snapshot:value.getDocuments()){
+                                Product product = snapshot.toObject(Product.class);
+                                product.setDocumentId(snapshot.getId());
+                                products.add(product);
+                            }
+                            productAdapter.notifyDataSetChanged();
                         }
-                        productAdapter.notifyDataSetChanged();
-                    }
-                });
+                    });
+        }).start();
     }
 }
 

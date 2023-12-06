@@ -62,7 +62,7 @@ public class AddProductActivity extends AppCompatActivity implements AdapterView
 
     ArrayList<String> categories;
 
-String category_name;
+    String category_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,17 +110,45 @@ String category_name;
                 EditText product_price = findViewById(R.id.product_price_input);
                 EditText prepare_time = findViewById(R.id.prepare_time_input);
                 EditText person_per_serve = findViewById(R.id.person_per_serve_input);
-Log.d("category-name",category_name);
                 EditText product_desc = findViewById(R.id.product_desc_input);
+                String name = product_name.getText().toString();
+                String price = product_price.getText().toString();
+                String prep_time = prepare_time.getText().toString();
+                String desc = product_desc.getText().toString();
+                String persons = person_per_serve.getText().toString();
+                if (name.isEmpty()) {
+                    product_name.setError("name can't be empty");
+                    return;
+                }
+
+                if (price.isEmpty()) {
+                    product_price.setError("price can't be empty");
+                    return;
+                }
+
+                if (desc.isEmpty()) {
+                    product_desc.setError("please add a description");
+                    return;
+                }
+                if (persons.isEmpty()) {
+                    product_desc.setError("persons per serve can't be empty");
+                    return;
+                }
+
+                if (imagePath == null) {
+                    Toast.makeText(AddProductActivity.this, "Please select an image", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 String imageId = UUID.randomUUID().toString();
                 Product product = new Product(
-                        product_name.getText().toString(),
-                        Double.valueOf(product_price.getText().toString()),
-                        Integer.valueOf(prepare_time.getText().toString()),
+                        name,
+                        Double.parseDouble(price),
+                        Integer.parseInt(prep_time),
                         0,
-                        product_desc.getText().toString(),
+                        desc,
                         category_name,
-                        Integer.parseInt(person_per_serve.getText().toString()),
+                        Integer.parseInt(persons),
                         imageId
                 );
 
@@ -129,62 +157,71 @@ Log.d("category-name",category_name);
                 progressDialog.setMessage("Saving the new product");
                 progressDialog.show();
 
-                firebaseFirestore.collection("products").add(product)
-                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                            @Override
-                            public void onSuccess(DocumentReference documentReference) {
-                                if (imagePath != null) {
-                                    progressDialog.setMessage("Uploading the image");
-                                    StorageReference storageReference = firebaseStorage.getReference("productImages")
-                                            .child(imageId);
-                                    storageReference.putFile(imagePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                        @Override
-                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                            progressDialog.dismiss();
-                                            product_name.clearComposingText();
-                                            Toast.makeText(AddProductActivity.this, "Product saved successfully", Toast.LENGTH_LONG).show();
+                new Thread(() -> {
+                    firebaseFirestore.collection("products").add(product)
+                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    if (imagePath != null) {
+                                        AddProductActivity.this.runOnUiThread(() -> {
+                                            progressDialog.setMessage("Uploading the image");
+                                        });
+                                        StorageReference storageReference = firebaseStorage.getReference("productImages")
+                                                .child(imageId);
+                                        storageReference.putFile(imagePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                            @Override
+                                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                AddProductActivity.this.runOnUiThread(progressDialog::dismiss);
+                                                product_name.clearComposingText();
+                                                Toast.makeText(AddProductActivity.this, "Product saved successfully", Toast.LENGTH_LONG).show();
 
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            progressDialog.dismiss();
-                                            Toast.makeText(AddProductActivity.this, "Oops! Something went wrong", Toast.LENGTH_LONG).show();
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                AddProductActivity.this.runOnUiThread(progressDialog::dismiss);
+                                                Toast.makeText(AddProductActivity.this, "Oops! Something went wrong", Toast.LENGTH_LONG).show();
 
-                                        }
-                                    }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                                        @Override
-                                        public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
-                                            double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
-                                            progressDialog.setMessage("Uploading image... " + (int) progress + "% done");
-                                        }
-                                    });
+                                            }
+                                        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                                            @Override
+                                            public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
+                                                double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
+                                                AddProductActivity.this.runOnUiThread(() -> {
+                                                    progressDialog.setMessage("Uploading image... " + (int) progress + "% done");
+
+                                                });
+                                            }
+                                        });
+                                    }
                                 }
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                progressDialog.dismiss();
-                                Toast.makeText(AddProductActivity.this, "Couldn't save the product", Toast.LENGTH_LONG).show();
-                            }
-                        });
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    AddProductActivity.this.runOnUiThread(progressDialog::dismiss);
+                                    Toast.makeText(AddProductActivity.this, "Couldn't save the product", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                }).start();
             }
         });
 
     }
 
     private void loadCategoryNames() {
-        firebaseFirestore.collection("categories")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        for(DocumentSnapshot snapshot :value.getDocuments()) {
-Category category = snapshot.toObject(Category.class);
-                            categories.add(category.getName());
-                        }
+        new Thread(()->{
+            firebaseFirestore.collection("categories")
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                            for (DocumentSnapshot snapshot : value.getDocuments()) {
+                                Category category = snapshot.toObject(Category.class);
+                                categories.add(category.getName());
+                            }
 
-                    }
-                });
+                        }
+                    });
+        }).start();
     }
 
     ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
@@ -211,8 +248,8 @@ Category category = snapshot.toObject(Category.class);
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         category_name = parent.getItemAtPosition(position).toString();
-        Toast.makeText(AddProductActivity.this, category_name, Toast.LENGTH_LONG).show();
-Log.d("onItemSelected",category_name);
+
+        Log.d("onItemSelected", category_name);
     }
 
     @Override
