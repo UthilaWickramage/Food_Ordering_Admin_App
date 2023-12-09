@@ -129,7 +129,7 @@ android:layout_marginRight="3dp"
                 android:id="@+id/material_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Block Customer"
+                android:text="@string/block_customer"
             app:useMaterialThemeColors="false"
                 android:layout_weight="1"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -141,7 +141,7 @@ android:layout_marginRight="3dp"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_marginStart="5dp"
-                android:text="Orders" />
+                android:text="@string/orders" />
         </LinearLayout>
 
     </LinearLayout>

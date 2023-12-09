@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.view.View;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -46,6 +47,13 @@ private Order order;
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(ViewOrdersActivity.this);
         recyclerView.setAdapter(orderAdapter);
         recyclerView.setLayoutManager(linearLayoutManager);
+
+        findViewById(R.id.imageView3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private void loadOrders() {

@@ -67,7 +67,7 @@
                 android:layout_height="40dp"
                 android:layout_gravity="bottom"
                 android:backgroundTint="#E53935"
-                android:text="Delete"
+                android:text="@string/delete"
                 android:textSize="12sp" />
         </LinearLayout>
 

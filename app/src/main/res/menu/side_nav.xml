@@ -4,55 +4,49 @@
     <group android:id="@+id/sideNavGroupMain">
         <item
             android:id="@+id/sideNavHome"
-            android:title="Home"
+            android:title="@string/home"
             android:checked="true"
 
             />
         <item
             android:id="@+id/sideNavAddProduct"
-            android:title="Add Product"
+            android:title="@string/add_product"
             android:visible="false"
             android:iconTint="@color/black"
             />
         <item
             android:id="@+id/sideNavViewProducts"
-            android:title="View Products"
+            android:title="@string/view_products"
             android:visible="false"
             android:iconTint="@color/black"
             />
         <item
             android:id="@+id/sideNavAddCategory"
-            android:title="Add Category"
+            android:title="@string/add_category"
             android:visible="false"
             android:iconTint="@color/black"
             />
         <item
             android:id="@+id/sideNavViewCategory"
-            android:title="View Category"
+            android:title="@string/view_categories"
             android:visible="false"
             android:iconTint="@color/black"
             />
         <item
             android:id="@+id/sideViewOrders"
-            android:title="View Orders"
+            android:title="@string/view_orders"
             android:icon="@drawable/baseline_delivery_dining_24"
             android:visible="false"
             android:iconTint="@color/black"
             />
         <item
             android:id="@+id/sideViewUsers"
-            android:title="View Users"
+            android:title="@string/view_users"
             android:icon="@drawable/baseline_supervised_user_circle_24"
             android:visible="false"
             android:iconTint="@color/black"
             />
-        <item
-        android:id="@+id/sideNavProfile"
-        android:title="Profile"
-        android:icon="@drawable/baseline_account_circle_24"
-        android:visible="false"
-        android:iconTint="@color/black"
-        />
+
 
 
 
@@ -61,13 +55,13 @@
     <group android:id="@+id/sideNavGroupAuth">
         <item
             android:id="@+id/sideNavLogin"
-            android:title="Login"
+            android:title="@string/login"
             android:iconTintMode="add"
             android:iconTint="@color/black"
             android:icon="@drawable/baseline_login_24"/>
         <item
             android:id="@+id/sideNavLogout"
-            android:title="Logout"
+            android:title="@string/logout"
             android:visible="false"/>
     </group>
 
