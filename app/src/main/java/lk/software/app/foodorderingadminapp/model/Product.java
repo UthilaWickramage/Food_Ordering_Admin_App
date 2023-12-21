@@ -3,8 +3,6 @@ package lk.software.app.foodorderingadminapp.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import lk.software.app.foodorderingadminapp.R;
-
 public class Product {
     public int id;
     public String name;
@@ -17,6 +15,8 @@ public class Product {
     public String image;
 private  String documentId;
 
+private String addedDate;
+
     public String getDocumentId() {
         return documentId;
     }
@@ -25,7 +25,7 @@ private  String documentId;
         this.documentId = documentId;
     }
 
-    public Product(String name, double price, int prepare_time, int rating, String description, String category_name, int person_per_serve, String image) {
+    public Product(String name, double price, int prepare_time, int rating, String description, String category_name, int person_per_serve, String image, String addedDate) {
         this.name = name;
         this.price = price;
         this.prepare_time = prepare_time;
@@ -34,9 +34,16 @@ private  String documentId;
         this.category_name = category_name;
         this.person_per_serve = person_per_serve;
         this.image = image;
+        this.addedDate = addedDate;
     }
 
+    public String getAddedDate() {
+        return addedDate;
+    }
 
+    public void setAddedDate(String addedDate) {
+        this.addedDate = addedDate;
+    }
 
     public Product() {
     }

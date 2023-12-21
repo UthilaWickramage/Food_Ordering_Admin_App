@@ -56,7 +56,7 @@ public class ViewCategoryActivity extends AppCompatActivity{
 
         RecyclerView recyclerView = findViewById(R.id.categoryRecyclerView);
         loadCategories();
-        categoryAdapter = new CategoryAdapter(categories,firebaseStorage,ViewCategoryActivity.this);
+        categoryAdapter = new CategoryAdapter(categories,firebaseFirestore,firebaseStorage,ViewCategoryActivity.this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(ViewCategoryActivity.this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(categoryAdapter);
@@ -87,6 +87,7 @@ findViewById(R.id.imageView3).setOnClickListener(new View.OnClickListener() {
                             categories.clear();
                             for(DocumentSnapshot snapshot:value.getDocuments()) {
                                 Category category = snapshot.toObject(Category.class);
+                                category.setDocumentId(snapshot.getId());
                                 categories.add(category);
                             }
                             categoryAdapter.notifyDataSetChanged();

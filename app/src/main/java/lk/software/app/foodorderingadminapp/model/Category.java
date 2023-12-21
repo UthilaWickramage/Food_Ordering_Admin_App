@@ -9,7 +9,7 @@ public class Category {
 
     private String name;
     private String image;
-
+private String documentId;
     public Category(String name, String image) {
 
         this.name = name;
@@ -19,7 +19,13 @@ public class Category {
     public Category() {
     }
 
+    public String getDocumentId() {
+        return documentId;
+    }
 
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
+    }
 
     public String getName() {
         return name;

@@ -516,6 +516,7 @@ android:id="@+id/drawerLayout"
                        android:layout_columnWeight="1"
                        android:layout_gravity="fill"
                        android:layout_margin="8dp"
+                       android:visibility="gone"
                        app:cardCornerRadius="2dp"
                        app:cardElevation="2dp">
 
@@ -542,7 +543,7 @@ android:id="@+id/drawerLayout"
                        android:layout_height="wrap_content"
                        android:layout_row="2"
                        android:layout_rowWeight="1"
-                       android:layout_column="1"
+                       android:layout_column="0"
                        android:layout_columnWeight="1"
                        android:layout_gravity="fill"
                        android:layout_margin="8dp"
@@ -560,8 +561,8 @@ android:id="@+id/drawerLayout"
                                android:layout_width="wrap_content"
                                android:layout_height="wrap_content"
                                android:text="@string/view_users"
-                               android:textSize="18dp"
                                android:textAlignment="center"
+                               android:textSize="18dp"
                                android:textStyle="bold" />
                        </LinearLayout>
                    </androidx.cardview.widget.CardView>

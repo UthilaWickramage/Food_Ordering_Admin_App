@@ -6,9 +6,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -16,7 +14,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -27,7 +24,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -40,12 +36,10 @@ import com.squareup.picasso.Picasso;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.navigation.NavigationBarView;
-import com.google.android.material.navigation.NavigationView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Calendar;
 import java.util.UUID;
 
 import lk.software.app.foodorderingadminapp.model.Category;
@@ -116,6 +110,9 @@ public class AddProductActivity extends AppCompatActivity implements AdapterView
                 String prep_time = prepare_time.getText().toString();
                 String desc = product_desc.getText().toString();
                 String persons = person_per_serve.getText().toString();
+                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat currentDate = new SimpleDateFormat("MM.dd.yyyy");
+                String saveCurrentDate = currentDate.format(calendar.getTime());
                 if (name.isEmpty()) {
                     product_name.setError("name can't be empty");
                     return;
@@ -149,8 +146,8 @@ public class AddProductActivity extends AppCompatActivity implements AdapterView
                         desc,
                         category_name,
                         Integer.parseInt(persons),
-                        imageId
-                );
+                        imageId,
+                        saveCurrentDate);
 
                 ProgressDialog progressDialog = new ProgressDialog(AddProductActivity.this);
                 progressDialog.setCancelable(false);
